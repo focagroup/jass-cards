@@ -56,6 +56,11 @@ python3 tools/make_icon.py        # icon.png + launcher icons (needs rsvg-conver
 
 ## Build (offline, no Gradle)
 
+The shared engine is the git submodule `framework/`
+([cards-framework](https://github.com/focagroup/cards-framework)). Clone with
+`git clone --recursive https://github.com/focagroup/jass-cards`, or run `git submodule update --init`
+in an existing clone.
+
 Requires JDK 17+ and the Android SDK (`platforms/android-35`, `build-tools/35.0.0`) in `~/Android/Sdk`.
 
 ```bash
@@ -65,16 +70,19 @@ Requires JDK 17+ and the Android SDK (`platforms/android-35`, `build-tools/35.0.
 ./build.sh relaytest # Bluetooth relay checks, with TCP standing in for Bluetooth
 ```
 
-The APK is signed with `~/claude/.keys/cards/jass.jks`, with its password in `jass.pass` next to it.
-Keys and passwords are never in git. Keep them backed up: Android only installs updates signed
-with the same key.
+The APK is signed with `~/claude/.keys/cards/jass.jks`, with its password in `jass.pass` next to it
+(see Signing in the framework README). Keys and passwords are never in git. Keep them backed up:
+Android only installs updates signed with the same key.
 
 ## Layout
 
+- `framework/` – git submodule [cards-framework](https://github.com/focagroup/cards-framework):
+  lobby/room base, HTTP server, Bluetooth relay, the Android activity and the shared `build.sh`
 - `app/core/` – pure Java: `Deal` (trick rules), `Weis`, `Mode`, one class per game
   (`TeamJass` = Schieber + Klassisch, `Bieter`, `Differenzler`, `Molotow`, `OhShit`, `TschauSepp`),
-  `Bot`, `Room`, `WebServer`
-- `app/src/` – Android `MainActivity` and `Bluetooth` (RFCOMM host listener / guest connector)
-- `app/core/.../Relay.java` – carries the API calls between guest and host over one stream
+  `Bot`, and `Room` (the framework room driving a `Match`)
+- `app/src/` – Android `MainActivity`: Jass's identity, colours and Bluetooth UUID on top of the
+  framework's `CardsActivity`
+- `game.conf` – build settings read by `framework/build.sh`
 - `app/assets/web/` – the UI
 - `desktop/` – desktop runner and `SimTest`
